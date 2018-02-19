@@ -11,8 +11,10 @@ To run the program, download the repository, run sbt with the repository as the 
 Here are a couple of illustrative examples where I played against the AI. Here, the red flags belong to the AI. In each example, I opened up a region (light green) with no flags. The AI then found the surrounding red flags! See if you can deduce them.
 
 
-![Alt text](minesweeper2.png?raw=true)
+<p align="center">
+  <img src="minesweeper2.png?raw=true"/>
+</p>
 
-
-
-![Alt text](minesweeper1.png?raw=true)
+<p align="center">
+  <img src="minesweeper1.png?raw=true"/>
+</p>
