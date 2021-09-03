@@ -79,7 +79,7 @@ class GameGUI[A](nWidth: Int, nHeight: Int, dWidth: Double, dHeight: Double, aiP
           if (! grid(x)(y).disabled.value && gameState.isBluesTurn) {
             makeMove(x, y)
             while (!gameState.isBluesTurn && !gameState.isGameOver) { // AI's move
-              //Thread.sleep(2000)
+              //Thread.sleep(1000)
               aiPlayer.bestMove(gameState) match {
                 case Some((x, y)) => makeMove(x, y)
                 case None => throw new Exception("AI couldn't make a valid move in this position: " + gameState)
@@ -101,18 +101,20 @@ class GameGUI[A](nWidth: Int, nHeight: Int, dWidth: Double, dHeight: Double, aiP
       case Left(error) => println(error)
       case Right(newGameState) => {
         gameState = newGameState
-        updateGameDisplay(grid, newGameState)
+        updateGameDisplay(grid, newGameState, Some((x, y)))
       }
     }
   }
 
   val colors = List("blue", "green", "red", "darkblue", "maroon", "orange", "purple", "hotpink")
   
-  def updateSquare(x: Int, y: Int, grid: GridToggleButtons, gameState: GameState): Unit = {
+  def updateSquare(x: Int, y: Int, grid: GridToggleButtons, gameState: GameState, lastMove: Option[Move]): Unit = {
     // Modify button grid(x)(y) to reflect the new state
     // state == MINE represents a mine
     // otherwise state will be an integer from 0 to 8 which counts
     // the number of neighbouring mines.
+
+    val borderColor = if (!lastMove.isEmpty && lastMove.get._1 == x && lastMove.get._2 == y) "#ff3333" else "#696969"
 
     grid(x)(y).disable = gameState.visible(x)(y)
     gameState.board(x)(y) match {
@@ -126,11 +128,11 @@ class GameGUI[A](nWidth: Int, nHeight: Int, dWidth: Double, dHeight: Double, aiP
           "-fx-background-repeat: no-repeat;"+
           "-fx-background-position: center;"+
           "-fx-opacity: 1.0;"+
-          "-fx-border-color: #696969;"
+          s"-fx-border-color: ${borderColor};"
       }
       case 0 => {
         grid(x)(y).style = "-fx-background-color: #eeffee;"+
-        "-fx-border-color: #696969;"+
+        s"-fx-border-color: ${borderColor};"+
         "-fx-opacity: 1.0;"
         grid(x)(y).text = ""
       }
@@ -138,7 +140,7 @@ class GameGUI[A](nWidth: Int, nHeight: Int, dWidth: Double, dHeight: Double, aiP
         grid(x)(y).text = k.toString
         val textColor = "-fx-text-fill: "+colors(k-1)+ ";"
         grid(x)(y).style = "-fx-background-color: #a9a9a9;"+
-        "-fx-border-color: #696969;"+
+        s"-fx-border-color: ${borderColor};"+
         textColor +
         "-fx-opacity: 1.0;"
       }
@@ -148,14 +150,14 @@ class GameGUI[A](nWidth: Int, nHeight: Int, dWidth: Double, dHeight: Double, aiP
   val redflagFilepath = new java.io.File("flag-red.png").toURI().toURL().toString()
   val blueflagFilepath = new java.io.File("flag-blue.png").toURI().toURL().toString()
 
-  def updateGameDisplay(grid: GridToggleButtons, gameState: GameState): Unit = {
+  def updateGameDisplay(grid: GridToggleButtons, gameState: GameState, lastMove: Option[Move]): Unit = {
     // Update buttons to display game state.
     // Call updateSquare for every square.
     for (x <- (0 until gameState.boardSize).toVector) yield {
       for (y <- (0 until gameState.boardSize).toVector) yield {
         if (gameState.visible(x)(y)) {
           val state = gameState.board(x)(y)
-          updateSquare(x, y, grid, gameState)
+          updateSquare(x, y, grid, gameState, lastMove)
         }
       }
     }

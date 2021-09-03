@@ -10,4 +10,8 @@ package object minesweeper {
   type SquareState = Int
   type Move = (Int, Int)
   val FLAG = -1
+
+  // Used in experience replay
+  // Curr-state, move, reward, state-after-move
+  type Experience = (GameState, Move)
 }

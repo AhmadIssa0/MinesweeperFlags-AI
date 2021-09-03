@@ -38,6 +38,11 @@ case class GameState(
     boardStr.map(row => row.mkString(" ")).mkString("\n")
   }
 
+  def reverseRedAndBlue: GameState = {
+    GameState(board, visible, !isBluesTurn, redFlagsCaptured, blueFlagsCaptured, totalFlags)
+  }
+
+
   /**
     * Returns either an error message or a new GameState if
     * move is valid.
@@ -170,4 +175,5 @@ object GameState {
   def createVisible(f: (Int, Int) => Boolean, boardSize: Int) = {
     Vector.tabulate[Boolean](boardSize, boardSize)(f)
   }
+
 }

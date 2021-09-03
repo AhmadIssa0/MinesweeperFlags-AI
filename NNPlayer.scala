@@ -52,6 +52,7 @@ case class NNPlayer(boardSize: Int, neuralNetwork: MultiLayerNetwork) {
     val labelTrain:INDArray = Nd4j.create(label)
 
     val ds = new DataSet(inputTrain, labelTrain)
+    ds.shuffle()
     //val dsIter: DataSetIterator = ds.iterateWithMiniBatches()
 
     println("Train model...")
@@ -74,7 +75,7 @@ case class NNPlayer(boardSize: Int, neuralNetwork: MultiLayerNetwork) {
       val out: INDArray = neuralNetwork.output(Nd4j.create(inputData(i)))
       val n = outputData(i).length
       for (j <- 0 until n) {
-        error += math.abs(outputData(i)(j) - out.getDouble(j))/n
+        error += math.abs(outputData(i)(j) - out.getDouble(j.asInstanceOf[java.lang.Integer]))/n
       }
     }
     error
@@ -85,10 +86,11 @@ case class NNPlayer(boardSize: Int, neuralNetwork: MultiLayerNetwork) {
     val out: INDArray = neuralNetwork.output(Nd4j.create(NNPlayer.gameStateToNNInput(gs)))
     for (j <- (0 until n).toVector) yield {
       for (i <- (0 until n).toVector) yield {
-        out.getDouble(j*n + i)
+        out.getDouble((j*n + i).asInstanceOf[java.lang.Integer])
       }
     }
   }
+
 
   def bestMove(gs: GameState, debug: Boolean = false): Option[Move] = {
     if (gs.isGameOver) None
@@ -186,13 +188,14 @@ object NNPlayer {
 
     val conf = new NeuralNetConfiguration.Builder()
       .seed(seed)
-      .iterations(iter)
+     // .iterations(iter) // deprecated, does nothing
       .miniBatch(true)
       .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-      .learningRate(learningRate)
+      //.learningRate(learningRate)
       .updater(Updater.NESTEROVS)
-      .momentum(0.9)
-      .regularization(true).l2(learningRate*.01)
+      //.momentum(0.9)
+    //.regularization(true).l2(learningRate*.01)
+      .l2(learningRate*.01)
       .list
       .layer(0, new ConvolutionLayer.Builder(3,3)
         .nIn(nChannels)
@@ -221,12 +224,14 @@ object NNPlayer {
         .activation(Activation.RELU)
         .build)
     
-      .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.EXPLL)
+    //.layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.EXPLL) // Works in 0.9.1
+    .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.XENT) // Haven't tested
         .activation(Activation.SIGMOID)
         .nOut(outputNum)
         .build)
       .setInputType(InputType.convolutionalFlat(boardSize, boardSize, nChannels))
-      .pretrain(false).backprop(true)
+    //.pretrain(false)
+      //.backprop(true)
       .build
 
     val model = new MultiLayerNetwork(conf)

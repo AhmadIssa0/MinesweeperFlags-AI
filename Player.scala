@@ -62,5 +62,31 @@ object Player {
       .filter(_ == true)
       .length
   }
+
+  // Returns avg number of flags first player won.
+  def playSeriesScore[A,B](boardSize: Int, first: Player[A], second: Player[B], numOfGames: Int): Double = {
+    // Sums up how many flags first player wins by
+
+    // Returns whether first player won
+    def firstWins(currGS: GameState, isFirstToMove: Boolean): Int = {
+      if (currGS.isGameOver) currGS.blueScore - currGS.redScore
+      else {
+        val player = if (currGS.isBluesTurn) first else second
+        val move = player.bestMove(currGS).get
+        val nextGS: GameState = currGS.makeMove(move._1, move._2) match {
+          case Right(gs) => gs
+          case Left(error) =>
+            throw new Exception(s"AI tries to play move: $move. But received error: $error")
+        }
+        firstWins(nextGS, !isFirstToMove)
+      }
+    }
+
+    val score = 
+    (0 until numOfGames)
+      .map(_ => firstWins(GameState.createNewGame(boardSize), true))
+      .sum
+    score / (1.0 * numOfGames)
+  }
 }
 
