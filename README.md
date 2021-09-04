@@ -1,8 +1,9 @@
 # MinesweeperFlags-AI
 
-In this project, we train a convolutional neural network reinforcement learning AI to play Minesweeper Flags through self-play using the Scala machine learning library deeplearning4j. Also included is a GUI written in ScalaFX allowing a human player to play against the AI.
+In this project, we train a deep convolutional neural network reinforcement learning AI to play Minesweeper Flags through self-play. This is written in Scala and uses the machine learning library deeplearning4j. We also wrote a a GUI written in ScalaFX allowing a human player to play against the AI.
 
-Minesweeper flags is a two-player turn-based variant of Minesweeper, where instead of mines there are flags, and the goal is to capture flags. When a player clicks on a square revealing a flag, thereby capturing it, he/she is given another turn.
+### Rules of the game
+Minesweeper flags is a two-player turn-based variant of Minesweeper, where instead of mines there are flags, and the goal is to capture flags. Numbers on a square indicate the number of flags adjacent to that square (maximum of 8). When a player clicks on a square revealing a flag, thereby capturing it, he/she is given another turn. The player that captures the most flags wins. Have fun!
 
 ### Instructions
 To run the program, download the repository, run sbt with the repository as the working directory. Finally, type 'run' in sbt.
